@@ -15,7 +15,7 @@ dotenv.config({path: '.env'});
 /**
  * Controllers (route handlers).
  */
-import * as indexController from './controllers/index';
+import * as supplierController from './controllers/supplier';
 
 /**
  * Create Express server.
@@ -49,7 +49,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(path.join(__dirname, 'public'), {maxAge: 31557600000}));
 
-app.use('/', indexController.getIndex);
+/**
+ * API routes.
+ */
+app.get('/suppliers', supplierController.getSuppliers);
+app.post('/suppliers', supplierController.postSuppliers);
+app.get('/suppliers/:id', supplierController.getSupplier);
+app.put('/suppliers/:id', supplierController.putSupplier);
+app.delete('/suppliers/:id', supplierController.deleteSupplier);
 
 /**
  * Error Handler. Provides full stack - remove for production
