@@ -127,3 +127,7 @@ fabric.properties
 
 # Ignore built ts files
 dist/**/*
+
+# Ignore mongodb files
+/data/mongo
+/data/mongo-test

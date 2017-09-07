@@ -1,0 +1,24 @@
+version: '2'
+
+services:
+  node:
+    image: node:6
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/app
+    links:
+      - mongo
+      - mongo-test
+    working_dir: /app
+    command: npm start
+
+  mongo:
+    image: mongo:3
+    volumes:
+      - ./data/mongo:/data/db
+
+  mongo-test:
+    image: mongo:3
+    volumes:
+      - ./data/mongo-test:/data/db
