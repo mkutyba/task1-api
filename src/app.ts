@@ -16,6 +16,7 @@ dotenv.config({path: '.env'});
  * Controllers (route handlers).
  */
 import * as supplierController from './controllers/supplier';
+import * as itemController from './controllers/item';
 
 /**
  * Create Express server.
@@ -57,6 +58,11 @@ app.post('/suppliers', supplierController.postSuppliers);
 app.get('/suppliers/:id', supplierController.getSupplier);
 app.put('/suppliers/:id', supplierController.putSupplier);
 app.delete('/suppliers/:id', supplierController.deleteSupplier);
+app.get('/items', itemController.getItems);
+app.post('/items', itemController.postItems);
+app.get('/items/:id', itemController.getItem);
+app.put('/items/:id', itemController.putItem);
+app.delete('/items/:id', itemController.deleteItem);
 
 /**
  * Error Handler. Provides full stack - remove for production
