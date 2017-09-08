@@ -37,8 +37,7 @@ describe('Items', () => {
         image: 'image test',
         description: 'description test',
         supplier_id: mongoose.Types.ObjectId(),
-      }, () => {
-      });
+      }, () => {});
       Item.create({
         number: 'number test 1',
         stock: 234,
@@ -46,8 +45,7 @@ describe('Items', () => {
         image: 'image test 1',
         description: 'description test 1',
         supplier_id: mongoose.Types.ObjectId(),
-      }, () => {
-      });
+      }, () => {});
 
       return chai.request(app)
         .get('/items')
@@ -224,8 +222,7 @@ describe('Items', () => {
         image: expectedImage,
         description: expectedDescription,
         supplier_id: expectedSupplierId,
-      }, () => {
-      });
+      }, () => {});
 
       return chai.request(app)
         .get('/items/' + expectedId)
@@ -274,8 +271,7 @@ describe('Items', () => {
         image: 'image test',
         description: 'description test',
         supplier_id: mongoose.Types.ObjectId(),
-      }, () => {
-      });
+      }, () => {});
 
       return chai.request(app)
         .put('/items/' + expectedId)
@@ -328,8 +324,7 @@ describe('Items', () => {
         image: 'image test',
         description: 'description test',
         supplier_id: mongoose.Types.ObjectId(),
-      }, () => {
-      });
+      }, () => {});
 
       return chai.request(app)
         .del('/items/' + idToDelete)

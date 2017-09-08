@@ -30,18 +30,18 @@ describe('Suppliers', () => {
     });
 
     it('responds with test entities', () => {
-      Supplier.create({
-        name: 'name-test',
-        number: 'number-test',
-        logo: 'logo-test',
-      }, () => {
-      });
-      Supplier.create({
-        name: 'name-test1',
-        number: 'number-test1',
-        logo: 'logo-test1',
-      }, () => {
-      });
+      Supplier.create([
+        {
+          name: 'name-test',
+          number: 'number-test',
+          logo: 'logo-test',
+        },
+        {
+          name: 'name-test1',
+          number: 'number-test1',
+          logo: 'logo-test1',
+        }
+      ], () => {});
 
       return chai.request(app)
         .get('/suppliers')
@@ -140,8 +140,7 @@ describe('Suppliers', () => {
         name: expectedName,
         number: expectedNumber,
         logo: expectedLogo,
-      }, () => {
-      });
+      }, () => {});
 
       return chai.request(app)
         .get('/suppliers/' + expectedId)
@@ -181,8 +180,7 @@ describe('Suppliers', () => {
         name: 'name-test',
         number: 'number-test',
         logo: 'logo-test',
-      }, () => {
-      });
+      }, () => {});
 
       return chai.request(app)
         .put('/suppliers/' + expectedId)
@@ -226,8 +224,7 @@ describe('Suppliers', () => {
         name: 'name-test',
         number: 'number-test',
         logo: 'logo-test',
-      }, () => {
-      });
+      }, () => {});
 
       return chai.request(app)
         .del('/suppliers/' + idToDelete)

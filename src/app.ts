@@ -27,14 +27,19 @@ const app = express();
  * Connect to MongoDB.
  */
 if (process.env.NODE_ENV === 'test') {
-  mongoose.connect(process.env.MONGODB_TEST_URI, {useMongoClient: true});
+  mongoose.connect(process.env.MONGODB_TEST_URI);
 } else {
-  mongoose.connect(process.env.MONGODB_URI, {useMongoClient: true});
+  mongoose.connect(process.env.MONGODB_URI);
 }
 
 mongoose.connection.on('error', () => {
-  console.log('MongoDB connection error. Please make sure MongoDB is running.');
-  process.exit();
+  console.error('MongoDB connection error. Please make sure MongoDB is running.');
+  if (process.env.NODE_ENV === 'test') {
+    console.error(process.env.MONGODB_TEST_URI);
+  } else {
+    console.error(process.env.MONGODB_URI);
+  }
+  process.exit(1);
 });
 
 /**
