@@ -29,37 +29,41 @@ describe('Items', () => {
         });
     });
 
-    it('responds with test entities', () => {
-      Item.create({
-        number: 'number test',
-        stock: 123,
-        online: true,
-        image: 'image test',
-        description: 'description test',
-        supplier_id: mongoose.Types.ObjectId(),
-      }, () => {});
-      Item.create({
-        number: 'number test 1',
-        stock: 234,
-        online: false,
-        image: 'image test 1',
-        description: 'description test 1',
-        supplier_id: mongoose.Types.ObjectId(),
-      }, () => {});
-
-      return chai.request(app)
-        .get('/items')
-        .then(res => {
-          expect(res.status).to.equal(200);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('array');
-          expect(res.body).to.have.length(2);
-        });
+    it('responds with test entities', (done) => {
+      Item.create([
+        {
+          number: 'number test',
+          stock: 123,
+          online: true,
+          image: 'image test',
+          description: 'description test',
+          supplier_id: mongoose.Types.ObjectId(),
+        },
+        {
+          number: 'number test 1',
+          stock: 234,
+          online: false,
+          image: 'image test 1',
+          description: 'description test 1',
+          supplier_id: mongoose.Types.ObjectId(),
+        }
+      ], () => {
+        chai.request(app)
+          .get('/items')
+          .then(res => {
+            expect(res.status).to.equal(200);
+            expect(res).to.be.json;
+            expect(res.body).to.be.an('array');
+            expect(res.body).to.have.length(2);
+            done();
+          })
+          .catch(done);
+      }).catch(done);
     });
   });
 
   describe('POST /items', () => {
-    it('inserts test entity', () => {
+    it('inserts test entity', (done) => {
       const expectedNumber = 'expected number';
       const expectedStock = 1234;
       const expectedOnline = true;
@@ -67,7 +71,7 @@ describe('Items', () => {
       const expectedDescription = 'expected description';
       const expectedSupplierId = mongoose.Types.ObjectId();
 
-      return chai.request(app)
+      chai.request(app)
         .post('/items')
         .send({
           number: expectedNumber,
@@ -91,8 +95,9 @@ describe('Items', () => {
             expect(item.get('image')).to.equal(expectedImage);
             expect(item.get('description')).to.equal(expectedDescription);
             expect(item.get('supplier_id')).to.deep.equal(expectedSupplierId);
-          });
-        });
+            done();
+          }).catch(done);
+        }).catch(done);
     });
 
     it('fails if no number specified', () => {
@@ -205,7 +210,7 @@ describe('Items', () => {
   });
 
   describe('GET /items/:id', () => {
-    it('responds with test entity', () => {
+    it('responds with test entity', (done) => {
       const expectedId = mongoose.Types.ObjectId();
       const expectedNumber = 'expected number';
       const expectedStock = 1234;
@@ -222,23 +227,25 @@ describe('Items', () => {
         image: expectedImage,
         description: expectedDescription,
         supplier_id: expectedSupplierId,
-      }, () => {});
-
-      return chai.request(app)
-        .get('/items/' + expectedId)
-        .then(res => {
-          expect(res.status).to.equal(200);
-          expect(res).to.be.json;
-          expect(res.body).to.be.a('object');
-          expect(res.body).to.deep.include({
-            number: expectedNumber,
-            stock: expectedStock,
-            online: expectedOnline,
-            image: expectedImage,
-            description: expectedDescription,
-            supplier_id: expectedSupplierId.toHexString(),
-          });
-        });
+      }, () => {
+        chai.request(app)
+          .get('/items/' + expectedId)
+          .then(res => {
+            expect(res.status).to.equal(200);
+            expect(res).to.be.json;
+            expect(res.body).to.be.a('object');
+            expect(res.body).to.deep.include({
+              number: expectedNumber,
+              stock: expectedStock,
+              online: expectedOnline,
+              image: expectedImage,
+              description: expectedDescription,
+              supplier_id: expectedSupplierId.toHexString(),
+            });
+            done();
+          })
+          .catch(done);
+      }).catch(done);
     });
 
     it('fails if entity does not exist', () => {
@@ -254,7 +261,7 @@ describe('Items', () => {
   });
 
   describe('PUT /items/:id', () => {
-    it('modifies test entity', () => {
+    it('modifies test entity', (done) => {
       const expectedId = mongoose.Types.ObjectId();
       const expectedNumber = 'expected number';
       const expectedStock = 1234;
@@ -271,33 +278,35 @@ describe('Items', () => {
         image: 'image test',
         description: 'description test',
         supplier_id: mongoose.Types.ObjectId(),
-      }, () => {});
+      }, () => {
+        chai.request(app)
+          .put('/items/' + expectedId)
+          .send({
+            number: expectedNumber,
+            stock: expectedStock,
+            online: expectedOnline,
+            image: expectedImage,
+            description: expectedDescription,
+            supplier_id: expectedSupplierId,
+          })
+          .then(res => {
+            expect(res.status).to.equal(200);
+            expect(res).to.be.json;
+            expect(res.body).to.be.a('object');
+            expect(res.body).to.deep.equal({message: 'Saved!'});
 
-      return chai.request(app)
-        .put('/items/' + expectedId)
-        .send({
-          number: expectedNumber,
-          stock: expectedStock,
-          online: expectedOnline,
-          image: expectedImage,
-          description: expectedDescription,
-          supplier_id: expectedSupplierId,
-        })
-        .then(res => {
-          expect(res.status).to.equal(200);
-          expect(res).to.be.json;
-          expect(res.body).to.be.a('object');
-          expect(res.body).to.deep.equal({message: 'Saved!'});
-
-          Item.findById(expectedId, (err, item) => {
-            expect(item.get('number')).to.equal(expectedNumber);
-            expect(item.get('stock')).to.equal(expectedStock);
-            expect(item.get('online')).to.equal(expectedOnline);
-            expect(item.get('image')).to.equal(expectedImage);
-            expect(item.get('description')).to.equal(expectedDescription);
-            expect(item.get('supplier_id')).to.deep.equal(expectedSupplierId);
-          });
-        });
+            Item.findById(expectedId, (err, item) => {
+              expect(item.get('number')).to.equal(expectedNumber);
+              expect(item.get('stock')).to.equal(expectedStock);
+              expect(item.get('online')).to.equal(expectedOnline);
+              expect(item.get('image')).to.equal(expectedImage);
+              expect(item.get('description')).to.equal(expectedDescription);
+              expect(item.get('supplier_id')).to.deep.equal(expectedSupplierId);
+              done();
+            }).catch(done);
+          })
+          .catch(done);
+      }).catch(done);
     });
 
     it('fails if entity does not exist', () => {
@@ -313,7 +322,7 @@ describe('Items', () => {
   });
 
   describe('DELETE /items/:id', () => {
-    it('deletes test entity', () => {
+    it('deletes test entity', (done) => {
       const idToDelete = mongoose.Types.ObjectId();
 
       Item.create({
@@ -324,20 +333,22 @@ describe('Items', () => {
         image: 'image test',
         description: 'description test',
         supplier_id: mongoose.Types.ObjectId(),
-      }, () => {});
+      }, () => {
+        chai.request(app)
+          .del('/items/' + idToDelete)
+          .then(res => {
+            expect(res.status).to.equal(200);
+            expect(res).to.be.json;
+            expect(res.body).to.be.a('object');
+            expect(res.body).to.deep.equal({message: 'Deleted!'});
 
-      return chai.request(app)
-        .del('/items/' + idToDelete)
-        .then(res => {
-          expect(res.status).to.equal(200);
-          expect(res).to.be.json;
-          expect(res.body).to.be.a('object');
-          expect(res.body).to.deep.equal({message: 'Deleted!'});
-
-          Item.find((err, items) => {
-            expect(items).to.have.length(0);
-          });
-        });
+            Item.find((err, items) => {
+              expect(items).to.have.length(0);
+              done();
+            }).catch(done);
+          })
+          .catch(done);
+      }).catch(done);
     });
 
     it('fails if entity does not exist', () => {
