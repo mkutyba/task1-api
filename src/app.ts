@@ -6,6 +6,7 @@ import * as errorHandler from 'errorhandler';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 import * as mongoose from 'mongoose';
+import * as cors from 'cors';
 
 /**
  * Load environment variables from .env file.
@@ -54,6 +55,7 @@ if (process.env.NODE_ENV !== 'test') {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(path.join(__dirname, 'public'), {maxAge: 31557600000}));
+app.use(cors());
 
 /**
  * API routes.
