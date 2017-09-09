@@ -9,7 +9,9 @@ export let getItems = (req: Request, res: Response) => {
     if (err) {
       return res.status(400).send(err);
     }
-    res.json(items);
+    res.json({
+      data: items
+    });
   });
 };
 
@@ -24,11 +26,14 @@ export let postItems = (req: Request, res: Response) => {
     image: req.body.image,
     description: req.body.description,
     supplier_id: req.body.supplier_id,
-  }, (err: any) => {
+  }, (err: any, item: Document) => {
     if (err) {
       return res.status(400).send(err);
     }
-    res.json({message: 'Saved!'});
+    res.json({
+      message: 'Saved!',
+      data: item,
+    });
   });
 };
 
@@ -40,7 +45,9 @@ export let getItem = (req: Request, res: Response) => {
     if (err) {
       return res.status(400).send(err);
     }
-    res.json(item);
+    res.json({
+      data: item
+    });
   });
 };
 

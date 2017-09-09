@@ -5,8 +5,10 @@ import { default as Supplier } from '../models/Supplier';
 import { default as app } from '../app';
 import * as chai from 'chai';
 import chaiHttp = require('chai-http');
+import * as chaiShallowDeepEqual from 'chai-shallow-deep-equal';
 
 chai.use(chaiHttp);
+chai.use(chaiShallowDeepEqual);
 const expect = chai.expect;
 chai.should();
 
@@ -24,8 +26,8 @@ describe('Suppliers', () => {
         .then(res => {
           expect(res.status).to.equal(200);
           expect(res).to.be.json;
-          expect(res.body).to.be.an('array');
-          expect(res.body).to.have.length(0);
+          expect(res.body.data).to.be.an('array');
+          expect(res.body.data).to.have.length(0);
         });
     });
 
@@ -47,8 +49,8 @@ describe('Suppliers', () => {
           .then(res => {
             expect(res.status).to.equal(200);
             expect(res).to.be.json;
-            expect(res.body).to.be.an('array');
-            expect(res.body).to.have.length(2);
+            expect(res.body.data).to.be.an('array');
+            expect(res.body.data).to.have.length(2);
             done();
           })
           .catch(done);
@@ -65,15 +67,23 @@ describe('Suppliers', () => {
       chai.request(app)
         .post('/suppliers')
         .send({
-          'name': expectedName,
-          'number': expectedNumber,
-          'logo': expectedLogo,
+          name: expectedName,
+          number: expectedNumber,
+          logo: expectedLogo,
         })
         .then(res => {
           expect(res.status).to.equal(200);
           expect(res).to.be.json;
-          expect(res.body).to.be.a('object');
-          expect(res.body).to.deep.equal({message: 'Saved!'});
+          expect(res.body).to.be.an('object');
+          expect(res.body.data).to.be.an('object');
+          expect(res.body).to.shallowDeepEqual({
+            message: 'Saved!',
+            data: {
+              name: expectedName,
+              number: expectedNumber,
+              logo: expectedLogo,
+            }
+          });
 
           Supplier.find((err, suppliers) => {
             const supplier = suppliers[0];
@@ -150,8 +160,9 @@ describe('Suppliers', () => {
           .then(res => {
             expect(res.status).to.equal(200);
             expect(res).to.be.json;
-            expect(res.body).to.be.a('object');
-            expect(res.body).to.deep.include({
+            expect(res.body).to.be.an('object');
+            expect(res.body.data).to.be.an('object');
+            expect(res.body.data).to.deep.include({
               name: expectedName,
               number: expectedNumber,
               logo: expectedLogo,
@@ -197,7 +208,7 @@ describe('Suppliers', () => {
           .then(res => {
             expect(res.status).to.equal(200);
             expect(res).to.be.json;
-            expect(res.body).to.be.a('object');
+            expect(res.body).to.be.an('object');
             expect(res.body).to.deep.equal({message: 'Saved!'});
 
             Supplier.findById(expectedId, (err, supplier) => {
@@ -238,7 +249,7 @@ describe('Suppliers', () => {
           .then(res => {
             expect(res.status).to.equal(200);
             expect(res).to.be.json;
-            expect(res.body).to.be.a('object');
+            expect(res.body).to.be.an('object');
             expect(res.body).to.deep.equal({message: 'Deleted!'});
 
             Supplier.find((err, suppliers) => {

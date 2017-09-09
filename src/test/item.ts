@@ -5,8 +5,10 @@ import { default as Item } from '../models/Item';
 import { default as app } from '../app';
 import * as chai from 'chai';
 import chaiHttp = require('chai-http');
+import * as chaiShallowDeepEqual from 'chai-shallow-deep-equal';
 
 chai.use(chaiHttp);
+chai.use(chaiShallowDeepEqual);
 const expect = chai.expect;
 chai.should();
 
@@ -24,8 +26,8 @@ describe('Items', () => {
         .then(res => {
           expect(res.status).to.equal(200);
           expect(res).to.be.json;
-          expect(res.body).to.be.an('array');
-          expect(res.body).to.have.length(0);
+          expect(res.body.data).to.be.an('array');
+          expect(res.body.data).to.have.length(0);
         });
     });
 
@@ -53,8 +55,8 @@ describe('Items', () => {
           .then(res => {
             expect(res.status).to.equal(200);
             expect(res).to.be.json;
-            expect(res.body).to.be.an('array');
-            expect(res.body).to.have.length(2);
+            expect(res.body.data).to.be.an('array');
+            expect(res.body.data).to.have.length(2);
             done();
           })
           .catch(done);
@@ -84,8 +86,19 @@ describe('Items', () => {
         .then(res => {
           expect(res.status).to.equal(200);
           expect(res).to.be.json;
-          expect(res.body).to.be.a('object');
-          expect(res.body).to.deep.equal({message: 'Saved!'});
+          expect(res.body).to.be.an('object');
+          expect(res.body.data).to.be.an('object');
+          expect(res.body).to.shallowDeepEqual({
+            message: 'Saved!',
+            data: {
+              number: expectedNumber,
+              stock: expectedStock,
+              online: expectedOnline,
+              image: expectedImage,
+              description: expectedDescription,
+              supplier_id: expectedSupplierId.toHexString(),
+            }
+          });
 
           Item.find((err, items) => {
             const item = items[0];
@@ -233,8 +246,9 @@ describe('Items', () => {
           .then(res => {
             expect(res.status).to.equal(200);
             expect(res).to.be.json;
-            expect(res.body).to.be.a('object');
-            expect(res.body).to.deep.include({
+            expect(res.body).to.be.an('object');
+            expect(res.body.data).to.be.an('object');
+            expect(res.body.data).to.deep.include({
               number: expectedNumber,
               stock: expectedStock,
               online: expectedOnline,
@@ -292,7 +306,7 @@ describe('Items', () => {
           .then(res => {
             expect(res.status).to.equal(200);
             expect(res).to.be.json;
-            expect(res.body).to.be.a('object');
+            expect(res.body).to.be.an('object');
             expect(res.body).to.deep.equal({message: 'Saved!'});
 
             Item.findById(expectedId, (err, item) => {
@@ -339,7 +353,7 @@ describe('Items', () => {
           .then(res => {
             expect(res.status).to.equal(200);
             expect(res).to.be.json;
-            expect(res.body).to.be.a('object');
+            expect(res.body).to.be.an('object');
             expect(res.body).to.deep.equal({message: 'Deleted!'});
 
             Item.find((err, items) => {

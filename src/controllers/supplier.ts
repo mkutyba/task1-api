@@ -9,7 +9,9 @@ export let getSuppliers = (req: Request, res: Response) => {
     if (err) {
       return res.status(400).send(err);
     }
-    res.json(suppliers);
+    res.json({
+      data: suppliers
+    });
   });
 };
 
@@ -21,11 +23,14 @@ export let postSuppliers = (req: Request, res: Response) => {
     name: req.body.name,
     number: req.body.number,
     logo: req.body.logo,
-  }, (err: any) => {
+  }, (err: any, supplier: Document) => {
     if (err) {
       return res.status(400).send(err);
     }
-    res.json({message: 'Saved!'});
+    res.json({
+      message: 'Saved!',
+      data: supplier,
+    });
   });
 };
 
@@ -37,7 +42,9 @@ export let getSupplier = (req: Request, res: Response) => {
     if (err) {
       return res.status(400).send(err);
     }
-    res.json(supplier);
+    res.json({
+      data: supplier
+    });
   });
 };
 
