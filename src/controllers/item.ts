@@ -30,7 +30,7 @@ export let postItems = (req: Request, res: Response) => {
     if (err) {
       return res.status(400).send(err);
     }
-    res.json({
+    res.status(201).json({
       message: 'Saved!',
       data: item,
     });
@@ -42,6 +42,9 @@ export let postItems = (req: Request, res: Response) => {
  */
 export let getItem = (req: Request, res: Response) => {
   Item.findById(req.params.id, (err, item) => {
+    if (!item) {
+      return res.status(404).send();
+    }
     if (err) {
       return res.status(400).send(err);
     }
@@ -65,7 +68,10 @@ export let putItem = (req: Request, res: Response) => {
       description: req.body.description,
       supplier_id: req.body.supplier_id,
     }
-  }, (err) => {
+  }, (err, item) => {
+    if (!item) {
+      return res.status(404).send();
+    }
     if (err) {
       return res.status(400).send(err);
     }
@@ -77,7 +83,10 @@ export let putItem = (req: Request, res: Response) => {
  * DELETE /items/:id
  */
 export let deleteItem = (req: Request, res: Response) => {
-  Item.findByIdAndRemove(req.params.id, (err) => {
+  Item.findByIdAndRemove(req.params.id, (err, item) => {
+    if (!item) {
+      return res.status(404).send();
+    }
     if (err) {
       return res.status(400).send(err);
     }

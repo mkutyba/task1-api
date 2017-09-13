@@ -72,7 +72,7 @@ describe('Suppliers', () => {
           logo: expectedLogo,
         })
         .then(res => {
-          expect(res.status).to.equal(200);
+          expect(res.status).to.equal(201);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
           expect(res.body.data).to.be.an('object');
@@ -180,7 +180,7 @@ describe('Suppliers', () => {
           expect(res.status).to.not.equal(200);
         })
         .catch(res => {
-          expect(res.status).to.equal(400);
+          expect(res.status).to.equal(404);
         });
     });
   });
@@ -229,7 +229,7 @@ describe('Suppliers', () => {
           expect(res.status).to.not.equal(200);
         })
         .catch(res => {
-          expect(res.status).to.equal(400);
+          expect(res.status).to.equal(404);
         });
     });
   });
@@ -268,7 +268,7 @@ describe('Suppliers', () => {
           expect(res.status).to.not.equal(200);
         })
         .catch(res => {
-          expect(res.status).to.equal(400);
+          expect(res.status).to.equal(404);
         });
     });
   });

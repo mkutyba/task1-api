@@ -27,7 +27,7 @@ export let postSuppliers = (req: Request, res: Response) => {
     if (err) {
       return res.status(400).send(err);
     }
-    res.json({
+    res.status(201).json({
       message: 'Saved!',
       data: supplier,
     });
@@ -39,6 +39,9 @@ export let postSuppliers = (req: Request, res: Response) => {
  */
 export let getSupplier = (req: Request, res: Response) => {
   Supplier.findById(req.params.id, (err, supplier) => {
+    if (!supplier) {
+      return res.status(404).send();
+    }
     if (err) {
       return res.status(400).send(err);
     }
@@ -59,7 +62,10 @@ export let putSupplier = (req: Request, res: Response) => {
       number: req.body.number,
       logo: req.body.logo,
     }
-  }, (err) => {
+  }, (err, supplier) => {
+    if (!supplier) {
+      return res.status(404).send();
+    }
     if (err) {
       return res.status(400).send(err);
     }
@@ -71,7 +77,10 @@ export let putSupplier = (req: Request, res: Response) => {
  * DELETE /suppliers/:id
  */
 export let deleteSupplier = (req: Request, res: Response) => {
-  Supplier.findByIdAndRemove(req.params.id, (err) => {
+  Supplier.findByIdAndRemove(req.params.id, (err, supplier) => {
+    if (!supplier) {
+      return res.status(404).send();
+    }
     if (err) {
       return res.status(400).send(err);
     }
