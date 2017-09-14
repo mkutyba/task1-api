@@ -1,5 +1,6 @@
 import { default as Supplier } from '../models/Supplier';
 import { Request, Response } from 'express';
+import Item from '../models/Item';
 
 /**
  * GET /suppliers
@@ -51,7 +52,6 @@ export let getSupplier = (req: Request, res: Response) => {
   });
 };
 
-
 /**
  * PUT /suppliers/:id
  */
@@ -85,5 +85,28 @@ export let deleteSupplier = (req: Request, res: Response) => {
       return res.status(400).send(err);
     }
     res.json({message: 'Deleted!'});
+  });
+};
+
+/**
+ * GET /suppliers/:id/items
+ */
+export let getSupplierItems = (req: Request, res: Response) => {
+  Supplier.findById(req.params.id, (err, supplier) => {
+    if (!supplier) {
+      return res.status(404).send();
+    }
+    if (err) {
+      return res.status(400).send(err);
+    }
+
+    Item.find({'supplier_id': supplier._id}, (err, items) => {
+      if (err) {
+        return res.status(400).send(err);
+      }
+      res.json({
+        data: items
+      });
+    });
   });
 };

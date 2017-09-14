@@ -65,6 +65,7 @@ app.post('/suppliers', supplierController.postSuppliers);
 app.get('/suppliers/:id', supplierController.getSupplier);
 app.put('/suppliers/:id', supplierController.putSupplier);
 app.delete('/suppliers/:id', supplierController.deleteSupplier);
+app.get('/suppliers/:id/items', supplierController.getSupplierItems);
 app.get('/items', itemController.getItems);
 app.post('/items', itemController.postItems);
 app.get('/items/:id', itemController.getItem);

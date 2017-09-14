@@ -1,3 +1,5 @@
+import Item from '../models/Item';
+
 process.env.NODE_ENV = 'test';
 
 import * as mongoose from 'mongoose';
@@ -264,6 +266,84 @@ describe('Suppliers', () => {
     it('fails if entity does not exist', () => {
       return chai.request(app)
         .del('/suppliers/1234')
+        .then(res => {
+          expect(res.status).to.not.equal(200);
+        })
+        .catch(res => {
+          expect(res.status).to.equal(404);
+        });
+    });
+  });
+
+  describe('GET /suppliers/:id/items', () => {
+    const supplierId = mongoose.Types.ObjectId();
+
+    it('responds with empty JSON array', (done) => {
+      Supplier.create([
+        {
+          _id: supplierId,
+          name: 'name-test',
+          number: 'number-test',
+          logo: 'logo-test',
+        }
+      ], () => {
+        chai.request(app)
+          .get(`/suppliers/${supplierId}/items`)
+          .then(res => {
+            expect(res.status).to.equal(200);
+            expect(res).to.be.json;
+            expect(res.body.data).to.be.an('array');
+            expect(res.body.data).to.have.length(0);
+            done();
+          })
+          .catch(done);
+      }).catch(done);
+    });
+
+    it('responds with test entities', (done) => {
+      Supplier.create([
+        {
+          _id: supplierId,
+          name: 'name-test',
+          number: 'number-test',
+          logo: 'logo-test',
+        }
+      ], () => {
+        Item.create([
+          {
+            number: 'number test',
+            stock: 123,
+            online: true,
+            image: 'image test',
+            description: 'description test',
+            supplier_id: supplierId,
+          },
+          {
+            number: 'number test 1',
+            stock: 234,
+            online: false,
+            image: 'image test 1',
+            description: 'description test 1',
+            supplier_id: supplierId,
+          }
+        ], () => {
+          chai.request(app)
+            .get(`/suppliers/${supplierId}/items`)
+            .then(res => {
+              expect(res.status).to.equal(200);
+              expect(res).to.be.json;
+              expect(res.body.data).to.be.an('array');
+              expect(res.body.data).to.have.length(2);
+              done();
+            })
+            .catch(done);
+        }).catch(done);
+      }).catch(done);
+    });
+
+    it('fails if entity does not exist', () => {
+      return chai.request(app)
+        .get('/suppliers/1234/items')
         .then(res => {
           expect(res.status).to.not.equal(200);
         })
