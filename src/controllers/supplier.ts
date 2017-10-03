@@ -1,112 +1,117 @@
-import { default as Supplier } from '../models/Supplier';
 import { Request, Response } from 'express';
-import Item from '../models/Item';
+import { models } from '../models';
+import { SupplierInstance } from '../models/interfaces/supplier';
+import { ItemInstance } from '../models/interfaces/item';
 
 /**
  * GET /suppliers
  */
 export let getSuppliers = (req: Request, res: Response) => {
-  Supplier.find((err, suppliers) => {
-    if (err) {
-      return res.status(400).send(err);
-    }
-    res.json({
-      data: suppliers
+  models.Supplier.findAll()
+    .then((suppliers: SupplierInstance[]) => {
+      res.status(200).json({data: suppliers});
+    })
+    .catch((error: Error) => {
+      res.status(400).send(error);
     });
-  });
 };
 
 /**
  * POST /suppliers
  */
 export let postSuppliers = (req: Request, res: Response) => {
-  Supplier.create({
+  models.Supplier.create({
     name: req.body.name,
     number: req.body.number,
     logo: req.body.logo,
-  }, (err: any, supplier: Document) => {
-    if (err) {
-      return res.status(400).send(err);
-    }
-    res.status(201).json({
-      message: 'Saved!',
-      data: supplier,
+  })
+    .then((supplier: SupplierInstance) => {
+      res.status(201).json({
+        message: 'Saved!',
+        data: supplier,
+      });
+    })
+    .catch((error: Error) => {
+      res.status(400).send(error);
     });
-  });
 };
 
 /**
  * GET /suppliers/:id
  */
 export let getSupplier = (req: Request, res: Response) => {
-  Supplier.findById(req.params.id, (err, supplier) => {
-    if (!supplier) {
-      return res.status(404).send();
-    }
-    if (err) {
-      return res.status(400).send(err);
-    }
-    res.json({
-      data: supplier
+  models.Supplier.findById(req.params.id)
+    .then((supplier: SupplierInstance) => {
+      if (!supplier) {
+        return res.status(404).send();
+      }
+      res.status(200).json({data: supplier});
+    })
+    .catch((error: Error) => {
+      res.status(400).send(error);
     });
-  });
 };
 
 /**
  * PUT /suppliers/:id
  */
 export let putSupplier = (req: Request, res: Response) => {
-  Supplier.findByIdAndUpdate(req.params.id, {
-    $set: {
+  models.Supplier.update({
       name: req.body.name,
       number: req.body.number,
       logo: req.body.logo,
-    }
-  }, (err, supplier) => {
-    if (!supplier) {
-      return res.status(404).send();
-    }
-    if (err) {
-      return res.status(400).send(err);
-    }
-    res.json({message: 'Saved!'});
-  });
+    },
+    {where: {id: req.params.id}})
+    .then((result) => {
+      const [updated] = result;
+      if (!updated) {
+        return res.status(404).send();
+      }
+      res.json({message: 'Saved!'});
+    })
+    .catch((error: Error) => {
+      res.status(400).send(error);
+    });
 };
 
 /**
  * DELETE /suppliers/:id
  */
 export let deleteSupplier = (req: Request, res: Response) => {
-  Supplier.findByIdAndRemove(req.params.id, (err, supplier) => {
-    if (!supplier) {
-      return res.status(404).send();
-    }
-    if (err) {
-      return res.status(400).send(err);
-    }
-    res.json({message: 'Deleted!'});
-  });
+  models.Supplier.destroy({where: {id: req.params.id}})
+    .then((deleted) => {
+      if (!deleted) {
+        return res.status(404).send();
+      }
+      res.json({message: 'Deleted!'});
+    })
+    .catch((error: Error) => {
+      res.status(400).send(error);
+    });
 };
 
 /**
  * GET /suppliers/:id/items
  */
 export let getSupplierItems = (req: Request, res: Response) => {
-  Supplier.findById(req.params.id, (err, supplier) => {
-    if (!supplier) {
-      return res.status(404).send();
-    }
-    if (err) {
-      return res.status(400).send(err);
-    }
 
-    Item.find({'supplier_id': supplier._id}, (err, items) => {
-      if (err) {
-        return res.status(400).send(err);
+  models.Supplier.findById(req.params.id)
+    .then((supplier: SupplierInstance) => {
+      if (!supplier) {
+        return res.status(404).send();
       }
-      res.json({
-        data: items
-      });
+
+      models.Item.findAll({where: {supplier_id: supplier.get('id')}})
+        .then((items: ItemInstance[]) => {
+          res.json({
+            data: items
+          });
+        })
+        .catch((error: Error) => {
+          res.status(400).send(error);
+        });
+    })
+    .catch((error: Error) => {
+      res.status(400).send(error);
     });
-  });
 };

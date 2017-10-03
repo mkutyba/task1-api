@@ -3,15 +3,8 @@ import * as compression from 'compression';
 import * as bodyParser from 'body-parser';
 import * as logger from 'morgan';
 import * as errorHandler from 'errorhandler';
-import * as dotenv from 'dotenv';
 import * as path from 'path';
-import * as mongoose from 'mongoose';
 import * as cors from 'cors';
-
-/**
- * Load environment variables from .env file.
- */
-dotenv.config({path: '.env'});
 
 /**
  * Controllers (route handlers).
@@ -23,25 +16,6 @@ import * as itemController from './controllers/item';
  * Create Express server.
  */
 const app = express();
-
-/**
- * Connect to MongoDB.
- */
-if (process.env.NODE_ENV === 'test') {
-  mongoose.connect(process.env.MONGODB_TEST_URI);
-} else {
-  mongoose.connect(process.env.MONGODB_URI);
-}
-
-mongoose.connection.on('error', () => {
-  console.error('MongoDB connection error. Please make sure MongoDB is running.');
-  if (process.env.NODE_ENV === 'test') {
-    console.error(process.env.MONGODB_TEST_URI);
-  } else {
-    console.error(process.env.MONGODB_URI);
-  }
-  process.exit(1);
-});
 
 /**
  * Express configuration.

@@ -8,17 +8,21 @@ services:
     volumes:
       - .:/app
     links:
-      - mongo
-      - mongo-test
+      - postgres
+      - postgres-test
     working_dir: /app
     command: npm start
 
-  mongo:
-    image: mongo:3
+  postgres:
+    image: postgres:9
     volumes:
-      - ./data/mongo:/data/db
+      - ./data/postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: 9deh7fsg879h
 
-  mongo-test:
-    image: mongo:3
+  postgres-test:
+    image: postgres:9
     volumes:
-      - ./data/mongo-test:/data/db
+      - ./data/postgres-test:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: 9deh7fsg879h

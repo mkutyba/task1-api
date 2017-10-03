@@ -1,9 +1,4 @@
-import Item from '../models/Item';
-
-process.env.NODE_ENV = 'test';
-
-import * as mongoose from 'mongoose';
-import { default as Supplier } from '../models/Supplier';
+import { models } from '../models';
 import { default as app } from '../app';
 import * as chai from 'chai';
 import chaiHttp = require('chai-http');
@@ -16,7 +11,7 @@ chai.should();
 
 describe('Suppliers', () => {
   beforeEach((done) => {
-    Supplier.remove({}, () => {
+    models.Supplier.destroy({truncate: true, cascade: true}).then(() => {
       done();
     });
   });
@@ -34,7 +29,7 @@ describe('Suppliers', () => {
     });
 
     it('responds with test entities', (done) => {
-      Supplier.create([
+      models.Supplier.bulkCreate([
         {
           name: 'name-test',
           number: 'number-test',
@@ -45,7 +40,7 @@ describe('Suppliers', () => {
           number: 'number-test1',
           logo: 'logo-test1',
         }
-      ], () => {
+      ]).then(() => {
         chai.request(app)
           .get('/suppliers')
           .then(res => {
@@ -87,7 +82,7 @@ describe('Suppliers', () => {
             }
           });
 
-          Supplier.find((err, suppliers) => {
+          models.Supplier.findAll().then(suppliers => {
             const supplier = suppliers[0];
             expect(supplier.get('name')).to.equal(expectedName);
             expect(supplier.get('number')).to.equal(expectedNumber);
@@ -146,17 +141,17 @@ describe('Suppliers', () => {
 
   describe('GET /suppliers/:id', () => {
     it('responds with test entity', (done) => {
-      const expectedId = mongoose.Types.ObjectId();
+      const expectedId = 123;
       const expectedName = 'expected name';
       const expectedNumber = 'expected number';
       const expectedLogo = 'expected logo';
 
-      Supplier.create({
-        _id: expectedId,
+      models.Supplier.create({
+        id: expectedId,
         name: expectedName,
         number: expectedNumber,
         logo: expectedLogo,
-      }, () => {
+      }).then(() => {
         chai.request(app)
           .get('/suppliers/' + expectedId)
           .then(res => {
@@ -188,18 +183,19 @@ describe('Suppliers', () => {
   });
 
   describe('PUT /suppliers/:id', () => {
-    it('modifies test entity', (done) => {
-      const expectedId = mongoose.Types.ObjectId();
-      const expectedName = 'expected name';
-      const expectedNumber = 'expected number';
-      const expectedLogo = 'expected logo';
+    const expectedName = 'expected name';
+    const expectedNumber = 'expected number';
+    const expectedLogo = 'expected logo';
 
-      Supplier.create({
-        _id: expectedId,
+    it('modifies test entity', (done) => {
+      const expectedId = 123;
+
+      models.Supplier.create({
+        id: expectedId,
         name: 'name-test',
         number: 'number-test',
         logo: 'logo-test',
-      }, () => {
+      }).then(() => {
         chai.request(app)
           .put('/suppliers/' + expectedId)
           .send({
@@ -213,7 +209,7 @@ describe('Suppliers', () => {
             expect(res.body).to.be.an('object');
             expect(res.body).to.deep.equal({message: 'Saved!'});
 
-            Supplier.findById(expectedId, (err, supplier) => {
+            models.Supplier.findById(expectedId).then(supplier => {
               expect(supplier.get('name')).to.equal(expectedName);
               expect(supplier.get('number')).to.equal(expectedNumber);
               expect(supplier.get('logo')).to.equal(expectedLogo);
@@ -227,6 +223,11 @@ describe('Suppliers', () => {
     it('fails if entity does not exist', () => {
       return chai.request(app)
         .put('/suppliers/1234')
+        .send({
+          name: expectedName,
+          number: expectedNumber,
+          logo: expectedLogo,
+        })
         .then(res => {
           expect(res.status).to.not.equal(200);
         })
@@ -238,14 +239,14 @@ describe('Suppliers', () => {
 
   describe('DELETE /suppliers/:id', () => {
     it('deletes test entity', (done) => {
-      const idToDelete = mongoose.Types.ObjectId();
+      const idToDelete = 123;
 
-      Supplier.create({
-        _id: idToDelete,
+      models.Supplier.create({
+        id: idToDelete,
         name: 'name-test',
         number: 'number-test',
         logo: 'logo-test',
-      }, () => {
+      }).then(() => {
         chai.request(app)
           .del('/suppliers/' + idToDelete)
           .then(res => {
@@ -254,7 +255,7 @@ describe('Suppliers', () => {
             expect(res.body).to.be.an('object');
             expect(res.body).to.deep.equal({message: 'Deleted!'});
 
-            Supplier.find((err, suppliers) => {
+            models.Supplier.findAll().then(suppliers => {
               expect(suppliers).to.have.length(0);
               done();
             }).catch(done);
@@ -276,17 +277,15 @@ describe('Suppliers', () => {
   });
 
   describe('GET /suppliers/:id/items', () => {
-    const supplierId = mongoose.Types.ObjectId();
+    const supplierId = 123;
 
     it('responds with empty JSON array', (done) => {
-      Supplier.create([
-        {
-          _id: supplierId,
-          name: 'name-test',
-          number: 'number-test',
-          logo: 'logo-test',
-        }
-      ], () => {
+      models.Supplier.create({
+        id: supplierId,
+        name: 'name-test',
+        number: 'number-test',
+        logo: 'logo-test',
+      }).then(() => {
         chai.request(app)
           .get(`/suppliers/${supplierId}/items`)
           .then(res => {
@@ -301,15 +300,13 @@ describe('Suppliers', () => {
     });
 
     it('responds with test entities', (done) => {
-      Supplier.create([
-        {
-          _id: supplierId,
-          name: 'name-test',
-          number: 'number-test',
-          logo: 'logo-test',
-        }
-      ], () => {
-        Item.create([
+      models.Supplier.create({
+        id: supplierId,
+        name: 'name-test',
+        number: 'number-test',
+        logo: 'logo-test',
+      }).then(() => {
+        models.Item.bulkCreate([
           {
             number: 'number test',
             stock: 123,
@@ -326,7 +323,7 @@ describe('Suppliers', () => {
             description: 'description test 1',
             supplier_id: supplierId,
           }
-        ], () => {
+        ]).then(() => {
           chai.request(app)
             .get(`/suppliers/${supplierId}/items`)
             .then(res => {

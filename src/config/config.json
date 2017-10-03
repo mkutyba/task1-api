@@ -1,0 +1,29 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": "9deh7fsg879h",
+    "database": "postgres",
+    "host": "postgres",
+    "port": 5432,
+    "dialect": "postgres",
+    "logging": false
+  },
+  "test": {
+    "username": "postgres",
+    "password": "9deh7fsg879h",
+    "database": "postgres",
+    "host": "postgres-test",
+    "port": 5432,
+    "dialect": "postgres",
+    "logging": false
+  },
+  "travis": {
+    "username": "postgres",
+    "password": "",
+    "database": "postgres",
+    "host": "localhost",
+    "port": 5432,
+    "dialect": "postgres",
+    "logging": false
+  }
+}
